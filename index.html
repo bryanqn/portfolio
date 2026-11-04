@@ -119,9 +119,29 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
 .key-bar[data-active] .key-btn:not([aria-pressed="true"]){opacity:.4; filter:saturate(.3)}
 .key-btn[aria-pressed="true"] svg{transform:scale(1.12)}
 .key-btn[aria-pressed="true"] .lbl{text-decoration:underline; text-decoration-thickness:3px; text-underline-offset:5px}
-.key-reset{margin-top:16px; font-size:.95rem; padding:7px 18px}
+.key{transition:opacity .6s ease, translate .6s cubic-bezier(.2,.8,.2,1)}
+.orchard.hold .key{opacity:0; translate:0 14px; pointer-events:none}
+.start-here{margin:0 0 clamp(40px,6vw,70px)}
+section[id], footer[id]{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 64px)}
+.start-title{font:800 clamp(1.6rem,3vw,2.2rem)/1 var(--font); color:var(--verm); margin:0 0 4px; text-transform:lowercase; text-shadow:.045em .055em 0 var(--soft-o)}
+.start-here .picks{margin-top:14px}
 
-.tree-wrap{position:relative; min-width:0}
+.tree-wrap{position:relative; min-width:0; transform-origin:50% 0}
+.intro-ground{display:none}
+body.intro .intro-ground{display:inline}
+.hero .name, .hero .sub, .hero .lead{transition:opacity .6s ease}
+.hero .sub{transition-delay:.15s}
+.hero .lead{transition-delay:.3s}
+body.intro .hero .sub, body.intro .hero .lead{opacity:0; transition:opacity .3s ease; transition-delay:0s}
+body.intro .hero{z-index:5}
+/* the name sprouts from its initials: b q n are seeds, the rest grows in, then it all ripens */
+.name .ch{display:inline-block; transform-origin:50% 92%; text-shadow:.035em .045em 0 var(--name-shadow);
+  transition:transform .62s cubic-bezier(.3,1.55,.5,1) var(--d,0s), opacity .25s ease var(--d,0s), color .45s ease var(--rd,0s), text-shadow .45s ease var(--rd,0s)}
+.name.seeding .ch{color:var(--leaf); text-shadow:.035em .045em 0 rgba(75,49,41,0); transition:none}
+.name.seeding .ch.seed{transform:translateX(var(--tx,0px))}
+.name.seeding .ch:not(.seed){transform:scale(0); opacity:0}
+.name.quick .ch{transition-duration:.25s !important; transition-delay:0s !important}
+body.intro .fruit{pointer-events:none}
 .tree-svg{display:block; width:100%; height:auto; overflow:visible; cursor:pointer}
 .tree-svg .ring{stroke:var(--line); stroke-width:2; stroke-dasharray:2 10; stroke-linecap:round}
 .tree-svg .yr{font:700 16px var(--font); fill:var(--brown-soft)}
@@ -166,7 +186,7 @@ body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-in
 .fruit .tag b{display:block; font-weight:700; font-size:1.02rem}
 .fruit .tag i{display:block; font-style:normal; font-weight:500; font-size:.8rem; color:var(--brown-soft); margin-top:2px}
 .fruit:hover .tag, .fruit:focus-visible .tag, .fruit:hover .string, .fruit:focus-visible .string{opacity:1}
-.fruit.feat .ico svg{filter:drop-shadow(3px 0 0 var(--gold)) drop-shadow(-3px 0 0 var(--gold)) drop-shadow(0 3px 0 var(--gold)) drop-shadow(0 -3px 0 var(--gold))}
+.fruit.feat .ico svg{filter:drop-shadow(3px 0 0 var(--gold)) drop-shadow(-3px 0 0 var(--gold)) drop-shadow(0 3px 0 var(--gold)) drop-shadow(0 -3px 0 var(--gold)) drop-shadow(0 0 10px rgba(242,183,5,.75))}
 .group a .t svg.star{width:20px; height:20px; margin-left:-2px}
 .picks{display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:18px 0 0}
 .picks .pl{font-weight:800; font-size:1rem; color:var(--brown); margin-right:4px; display:flex; align-items:center; gap:6px}
@@ -319,7 +339,6 @@ figcaption{font-size:.9rem; font-weight:600; color:var(--brown-soft); margin-top
   .key-btn{gap:6px}
   .key-btn svg{width:30px; height:30px}
   .key-btn .lbl{font-size:1rem}
-  .key-reset{margin-top:10px; font-size:.9rem; padding:6px 16px}
   .about-a, .about-b, .cs-grid, .foot-in{grid-template-columns:1fr}
   .foot ul{justify-self:start; text-align:left}
   .me{width:calc(50% + var(--margin)); max-width:none; margin:-46% calc(-1 * var(--margin)) -2px 0}
@@ -358,15 +377,13 @@ figcaption{font-size:.9rem; font-weight:600; color:var(--brown-soft); margin-top
       <h1 class="name" aria-label="Bryan Q. Nguyen">bryan q. nguyen</h1>
       <p class="sub"><span class="o">bqn@stanford.edu</span></p>
       <p class="lead">designing fun, useful things for people and the planet!</p>
-      <div class="picks" id="picks" aria-label="Featured projects"></div>
     </div>
   </section>
 
-  <section class="wrap orchard" id="tree" aria-label="Project tree">
+  <section class="wrap orchard hold" id="tree" aria-label="Project tree">
     <div class="key" role="group" aria-label="Show projects by section">
-      <p class="hint">pick a fruit to open it, or a color to filter.</p>
+      <p class="hint">pick a fruit to view a project, or filter here</p>
       <div class="key-bar" id="keyBar"></div>
-      <button class="btn btn-cream key-reset" id="keyReset" hidden>show everything</button>
     </div>
     <div class="tree-wrap" id="treeWrap">
       <svg class="tree-svg" id="treeSvg" aria-hidden="true"></svg>
@@ -379,6 +396,10 @@ figcaption{font-size:.9rem; font-weight:600; color:var(--brown-soft); margin-top
   <div class="lower">
   <section class="section" id="work" aria-labelledby="workTitle">
     <div class="wrap">
+      <div class="start-here">
+        <h3 class="start-title">featured projects</h3>
+        <div class="picks" id="picks" aria-label="Featured projects"></div>
+      </div>
       <h2 class="title" id="workTitle">every project</h2>
       <p class="subtitle">sorted by section, newest first</p>
       <div class="groups" id="groups"></div>
@@ -763,6 +784,7 @@ const XS = [.74,.28,.56,.1,.88,.4,.67,.18,.93,.48,.06,.8,.33,.61,.15,.85,.44,.71
 let lastW=0, layout=null, hasGrown=false, growDone=null;
 function finishGrowth(){ clearTimeout(growDone); $("#treeSvg").classList.remove("growing"); document.querySelectorAll(".fruit").forEach(e=>e.classList.add("budding","ripe")); }
 function buildTree(){
+  if(introOn){ introOn=false; cancelAnimationFrame(introRAF); clearTimeout(introTimer); document.body.classList.remove("intro"); $("#treeWrap").style.transition="none"; $("#treeWrap").style.transform=""; }
   const wrap=$("#treeWrap"), W=Math.round(wrap.clientWidth);
   if(!W) return; lastW=W;
   const small=W<640, r=small?30:48, step=small?136:134, extra=small?44:56, top=small?56:64, n=newestFirst.length;
@@ -823,7 +845,7 @@ function buildTree(){
     const js=best[0]<f.fx?-1:1, tw=small?8:13;
     const elbow=[best[0]+(f.fx-best[0])*.35, best[1]-Math.max(10,(best[1]-f.fy)*.65)];
     f.grow = .75 + (1 - f.fy/H)*.65;   // lower fruit first, following the growth upward
-    const fr=r*(FEATURED.includes(f.p.id)?1.3:.88);
+    const fr=r;
     add([best, elbow, [f.fx, f.fy+fr*.55]], tw, tw*.6, f.grow, .3, "var(--bark-dark)", "var(--bark-dark)");
     if(f.i%3===0){
       const len=(small?24:40)+rand()*(small?12:22);
@@ -840,13 +862,16 @@ function buildTree(){
   });
   // tall grass blades
   const blades=[]; const br=rng(77);
-  for(let x=-10; x<W+20; x+=(small?18:26)+br()*(small?18:30)){
+  const wl=wrap.getBoundingClientRect().left;   // grass runs edge to edge of the screen
+  for(let x=-wl-10; x<innerWidth-wl+20; x+=(small?18:26)+br()*(small?18:30)){
     if(Math.abs(x-rootX)<(small?40:70) || Math.abs(x-r2[0])<(small?22:40)) continue;
     const h=(small?40:70)+br()*(small?60:120), w=(small?10:16)+br()*10, lean=(br()-.5)*w*1.6;
     blades.push(`<g class="blade" style="--delay:${((.2+br()*.6)*SPD).toFixed(2)}s">${poly([[x,groundY+46],[x+w,groundY+46],[x+w*.5+lean,groundY+46-h]], br()<.5?"var(--grass)":"var(--grass-dark)")}</g>`);
   }
 
-  const rings=fruits.filter(f=>f.newYear).map(f=>({y:f.fy-r-(small?30:34), label:year(f.p)}));
+  // each year's line sits below its oldest fruit: everything above the line happened in that year
+  const rings=[]; fruits.forEach((f,i)=>{ const nx=fruits[i+1]; if(!nx || year(nx.p)!==year(f.p)) rings.push({y:f.fy+r+(small?24:30), label:year(f.p)}); });
+  rings.push({y:fruits[0].fy-r-(small?30:34), label:String(+year(fruits[0].p)+1)});   // next year's line: no fruit yet, but the branches already reach past it
   const masks=[], groups=[];
   parts.forEach((pt,k)=>{
     const d="M"+pt.path.map(q=>q[0].toFixed(1)+" "+q[1].toFixed(1)).join(" L");
@@ -861,11 +886,12 @@ function buildTree(){
     ${rings.map(g=>`<line class="ring" x1="0" x2="${W}" y1="${g.y}" y2="${g.y}"/><text class="yr" x="0" y="${g.y-10}">${g.label}</text>`).join("")}
     <g class="branches">${groups.join("")}</g>
     <g class="leaves">${leaves.join("")}</g>
-    <g class="grass">${blades.join("")}</g>`;
+    <g class="grass">${blades.join("")}</g>
+    <rect class="intro-ground" x="-8000" y="${groundY+44}" width="${W+16000}" height="260" fill="var(--ground)"/>`;
 
   $("#fruits").innerHTML=fruits.map(({p,fx,fy},idx)=>{
     const c=CATS[p.category], half=small?70:95, shift=Math.max(half-fx,0)-Math.max(fx+half-W,0);
-    const feat=FEATURED.includes(p.id), k=feat?1.3:.88, size=r*3.05*k;
+    const feat=FEATURED.includes(p.id), k=1, size=r*3.05*k;
     return `<a class="fruit${feat?" feat":""}" href="#${p.id}" data-id="${p.id}" data-cat="${p.category}" data-also="${(p.also||[]).join(" ")}" data-i="${idx}" style="left:${fx}px; top:${fy}px; --shift:${shift}px; --r:${r*k}px; --cat:${c.fill}"
         aria-label="${esc(p.title)}, ${yearLabel(p)}, ${esc(secLabel(p))}${feat?", featured":""}">
       <span class="ico" style="width:${size}px; height:${size}px"><svg viewBox="-60 -64 120 120" aria-hidden="true">
@@ -886,7 +912,10 @@ function buildTree(){
   applyFilter();
   const fruitEls=[...document.querySelectorAll(".fruit")];
   hasGrown=true;
-  if(!animate){ fruitEls.forEach(e=>e.classList.add("budding","ripe")); return; }
+  if(!animate){ fruitEls.forEach(e=>e.classList.add("budding","ripe")); revealControls(); return; }
+  const ripeEnd=Math.max(...fruits.map(f=>(f.grow+.3)*SPD+.5));
+  if(!introPlayed){ introPlayed=true; holdControls(9999); startIntro(ripeEnd+.55); }   // the zoom-in camera only plays on the first visit
+  else holdControls(ripeEnd+.9);                                                         // the sun: grow in place, then bring the controls back
   fruits.forEach((f,idx)=>{
     const el=fruitEls[idx];
     setTimeout(()=>el.classList.add("budding"), (f.grow+.3)*SPD*1000);
@@ -929,14 +958,12 @@ function buildKey(){
   const bar=$("#keyBar");
   bar.innerHTML=`<button class="key-btn" type="button" data-cat="featured" aria-pressed="false"><svg viewBox="-50 -50 100 100" aria-hidden="true">${goldRing(40)}</svg><span class="lbl">featured</span></button>`+Object.entries(CATS).map(([k,c])=>`<button class="key-btn" type="button" data-cat="${k}" aria-pressed="false">${dotSwatch(k)}<span class="lbl">${esc(c.label)}</span></button>`).join("");
   bar.addEventListener("click", e=>{ const b=e.target.closest(".key-btn"); if(!b) return; active=active===b.dataset.cat?null:b.dataset.cat; applyFilter(); });
-  $("#keyReset").addEventListener("click", ()=>{ active=null; applyFilter(); });
 }
 function applyFilter(){
   const bar=$("#keyBar");
   active ? bar.setAttribute("data-active","") : bar.removeAttribute("data-active");
   bar.querySelectorAll(".key-btn").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.cat===active)));
   document.querySelectorAll(".fruit").forEach(f=>{ const dim=!!active && (active==="featured" ? !f.classList.contains("feat") : (f.dataset.cat!==active && !f.dataset.also.split(" ").includes(active))); f.classList.toggle("dim",dim); dim?f.setAttribute("tabindex","-1"):f.removeAttribute("tabindex"); });
-  $("#keyReset").hidden=!active;
 }
 
 /* ---------- every project ---------- */
@@ -1089,7 +1116,7 @@ function produceScale(p, c){
     ${poly(circ(R-12,cx,cy,64),"#FFFBF2")}
     ${poly(circ(R-12,cx,cy,64),c.light,'opacity=".45"')}
     ${ticks}${labels}
-    <text x="${cx}" y="${cy+32}" text-anchor="middle" font-family="Jost, sans-serif" font-weight="700" font-size="10" fill="#6E5320" letter-spacing="1">fresh picked</text>
+    
     ${(()=>{ const L=[p.category,...(p.also||[])].map(k=>CATS[k].label.toLowerCase());
       return L.length>1
         ? `<text x="${cx}" y="${cy+49}" text-anchor="middle" font-family="Jost, sans-serif" font-weight="800" font-size="11" fill="${c.deep}">${esc(L[0])}</text><text x="${cx}" y="${cy+61}" text-anchor="middle" font-family="Jost, sans-serif" font-weight="700" font-size="9.5" fill="${CATS[p.also[0]].deep}">+ ${esc(L[1])}</text>`
@@ -1157,8 +1184,8 @@ function buildCrate(){
     <g transform="rotate(-3 230 214)">
       ${poly([[118,168],[342,164],[346,262],[114,266]],"var(--cream)")}
       ${poly([[124,164],[132,164],[132,172],[124,172]],"#3A2414")}${poly([[328,160],[336,160],[336,168],[328,168]],"#3A2414")}
-      <text x="230" y="194" text-anchor="middle" font-size="15" font-weight="600" fill="#8A4B12">let’s squeeze in</text>
-      <text x="230" y="222" text-anchor="middle" font-size="30" font-weight="800" fill="var(--green)">a chat</text>
+      <text x="230" y="200" text-anchor="middle" font-size="23" font-weight="700" fill="var(--green)">let’s <tspan font-weight="900" font-style="italic" fill="var(--verm)">squeeze</tspan> in</text>
+      <text x="230" y="227" text-anchor="middle" font-size="23" font-weight="700" fill="var(--green)">a chat</text>
       <text x="230" y="250" text-anchor="middle" font-size="17" font-weight="700" fill="var(--brown)" text-decoration="underline">bqn@stanford.edu</text>
     </g>
     <g class="tagg">
@@ -1178,8 +1205,83 @@ function starSticker(cx=26, cy=-24, R=13){
 }
 function buildPicks(){
   const items=FEATURED.map(id=>PROJECTS.find(p=>p.id===id)).filter(Boolean);
-  $("#picks").innerHTML=`<span class="pl"><svg viewBox="-50 -50 100 100" aria-hidden="true">${goldRing(38)}</svg>featured projects</span>`+
+  $("#picks").innerHTML=
     items.map(p=>`<a class="pick" href="#${p.id}">${smallFruit(p)}<span>${esc(PICK_LABEL[p.id]||p.title)}</span></a>`).join("");
+}
+
+
+/* ---------- staged reveal: the tree grows first, then the controls arrive ---------- */
+let revealTimer=null;
+function revealControls(){ clearTimeout(revealTimer); $(".orchard").classList.remove("hold"); }
+function holdControls(sec){
+  $(".orchard").classList.add("hold");
+  clearTimeout(revealTimer); revealTimer=setTimeout(revealControls, sec*1000);
+}
+["pointerdown","keydown","wheel","touchstart"].forEach(ev=>addEventListener(ev, ()=>{ if(introOn) skipIntro(); else if($(".orchard").classList.contains("hold")) revealControls(); }, {passive:true}));
+addEventListener("scroll", ()=>{ if(gliding) return; if(scrollY>40){ if(introOn) skipIntro(); else if($(".orchard").classList.contains("hold")) revealControls(); } }, {passive:true});
+
+/* ---------- the intro: a camera that starts low and zooms up the tree as it grows ---------- */
+let introOn=false, introTimer=null, introRAF=0, introPlayed=false, gliding=false;
+function startIntro(growSec){
+  const wrap=$("#treeWrap");
+  window.scrollTo({top:0, behavior:"instant"});
+  document.body.classList.add("intro"); introOn=true; seedName();
+  wrap.style.transition="none"; wrap.style.transform="";
+  const r=wrap.getBoundingClientRect(), barB=$(".bar").getBoundingClientRect().bottom, ih=innerHeight;
+  const Hb=r.height+140, fit=(ih-barB-24)/Hb;
+  const s0=Math.min(1, fit*2.2);                    // start a little zoomed in, on the bottom of the tree
+  const T=Math.max(2.2, growSec-.95)*1000;          // arrive just as the top fruit sprout
+  const HOLD=750;                                   // linger on the grass while the trunk sprouts
+  const ease=p=>p<.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+  const t0=performance.now();
+  const frame=now=>{
+    if(!introOn) return;
+    const p=ease(Math.min(1,Math.max(0,now-t0-HOLD)/(T-HOLD))), sc=s0+(1-s0)*p;
+    const yA=Hb*(1-p), Y=(ih-14)*(1-p)+r.top*p;      // which part of the tree sits where on screen
+    wrap.style.transform=`translateY(${(Y-r.top-yA*sc).toFixed(1)}px) scale(${sc.toFixed(4)})`;
+    if(p<1) introRAF=requestAnimationFrame(frame);
+    else { introOn=false; wrap.style.transform=""; document.body.classList.remove("intro"); sproutName(false); }
+  };
+  cancelAnimationFrame(introRAF); introRAF=requestAnimationFrame(frame);
+  clearTimeout(revealTimer); revealTimer=setTimeout(revealControls, (growSec+.35)*1000);
+}
+function endIntro(fast){
+  if(!introOn) return; introOn=false; cancelAnimationFrame(introRAF); clearTimeout(introTimer);
+  const wrap=$("#treeWrap");
+  wrap.style.transition=`transform ${fast?.4:1.2}s cubic-bezier(.65,0,.25,1)`;
+  wrap.style.transform="";
+  sproutName(fast);
+  setTimeout(()=>document.body.classList.remove("intro"), fast?60:700);
+  clearTimeout(revealTimer); revealTimer=setTimeout(revealControls, fast?250:1350);
+}
+function skipIntro(){ finishGrowth(); endIntro(true); }
+
+
+/* ---------- the name: seeds b q n spread apart, the other letters sprout, then everything ripens ---------- */
+function splitName(){
+  const h=$(".name"), txt=h.textContent;
+  h.innerHTML=[...txt].map((c,i)=>`<span class="ch${(i===0||txt[i-1]===" ")?" seed":""}" aria-hidden="true">${c===" "?"&nbsp;":esc(c)}</span>`).join("");
+}
+function seedName(){
+  const h=$(".name"), ch=[...h.querySelectorAll(".ch")]; if(!ch.length) return;
+  h.classList.remove("quick"); h.classList.add("seeding");
+  const seeds=ch.filter(c=>c.classList.contains("seed"));
+  const nameW=ch[ch.length-1].offsetLeft+ch[ch.length-1].offsetWidth;
+  let x=nameW/2 - seeds.reduce((a,c)=>a+c.offsetWidth,0)/2;
+  seeds.forEach(c=>{ c.style.setProperty("--tx", (x-c.offsetLeft).toFixed(1)+"px"); x+=c.offsetWidth; });
+  const seedIdx=ch.map((c,i)=>c.classList.contains("seed")?i:-1).filter(i=>i>=0);
+  ch.forEach((c,i)=>{
+    const dist=Math.min(...seedIdx.map(j=>Math.abs(i-j)));
+    c.style.setProperty("--d", c.classList.contains("seed") ? "0s" : (.18+dist*.06).toFixed(2)+"s");
+    c.style.setProperty("--rd", (.62+i*.04).toFixed(2)+"s");
+  });
+}
+function sproutName(fast){
+  const h=$(".name"); if(!h.classList.contains("seeding")) return;
+  void h.offsetWidth;
+  if(fast) h.classList.add("quick");
+  h.classList.remove("seeding");
+  setTimeout(()=>h.classList.remove("quick"), 2000);
 }
 
 /* ---------- menu ---------- */
@@ -1206,7 +1308,7 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape" && $("#menu").class
 /* ---------- routing ---------- */
 function route(){
   const h=decodeURIComponent(location.hash.slice(1)), p=PROJECTS.find(x=>x.id===h);
-  if(p){ finishGrowth(); renderCase(p); $("#home").hidden=true; $("#case").hidden=false; window.scrollTo({top:0, behavior:"instant"}); currentCase=p.id; if(pendingFly) flyIn(); else weigh(); }
+  if(p){ finishGrowth(); if(introOn) endIntro(true); revealControls(); renderCase(p); $("#home").hidden=true; $("#case").hidden=false; window.scrollTo({top:0, behavior:"instant"}); currentCase=p.id; if(pendingFly) flyIn(); else weigh(); }
   else{
     const leaving=!$("#case").hidden ? currentCase : null;
     const from=leaving ? caseFruitRect() : null;
@@ -1254,11 +1356,14 @@ $("#mark").addEventListener("click", e=>{
   e.preventDefault();
   if(!$("#case").hidden){ regrowNext=true; location.hash="top"; return; }
   if(location.hash && location.hash!=="#top") history.replaceState(null,"","#top");
-  window.scrollTo({top:0, behavior:reduceMotion?"instant":"smooth"});
-  hasGrown=false; buildTree();
+  if(reduceMotion || scrollY<4){ window.scrollTo({top:0, behavior:"instant"}); hasGrown=false; buildTree(); return; }
+  gliding=true; window.scrollTo({top:0, behavior:"smooth"});
+  hasGrown=false; buildTree();   // the tree regrows while the page glides up
+  const t0=performance.now(), wait=()=>{ if(scrollY<4 || performance.now()-t0>2000) gliding=false; else requestAnimationFrame(wait); };
+  requestAnimationFrame(wait);
 });
 
-buildSun(); buildCloud(); buildKey(); buildGroups(); buildPicks(); buildSlice(); buildCrate(); route(); if(!layout) buildTree();
+splitName(); buildSun(); buildCloud(); buildKey(); buildGroups(); buildPicks(); buildSlice(); buildCrate(); route(); if(!layout) buildTree();
 let rt; window.addEventListener("resize",()=>{ clearTimeout(rt); rt=setTimeout(()=>{ if(!$("#home").hidden && Math.round($("#treeWrap").clientWidth)!==lastW) buildTree(); },150); });
 window.addEventListener("hashchange", route);
 </script>
